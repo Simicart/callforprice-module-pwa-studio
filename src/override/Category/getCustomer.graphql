@@ -1,0 +1,10 @@
+query getCustomer {
+    customer {
+        id
+        email
+        firstname
+        lastname
+        is_subscribed
+        group_id
+    }
+}
