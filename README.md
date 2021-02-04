@@ -40,11 +40,17 @@ Modify the dependencies of your project to add Shop By Brand extension.
 ```
   "dependencies": {
     "@magento/pwa-buildpack": "~7.0.0",
-    "@simicart/callforprice": "link:./@simicart/callforprice"
+    "@simicart/CallForPrice": "link:./@simicart/callforprice"
   },
 ```
 
-### 5. Install and Start Project
+### 5. Modify package.json
+
+```
+  yarn add reactjs-popup
+```
+
+### 6. Install and Start Project
 
 ```
   yarn install && yarn watch
