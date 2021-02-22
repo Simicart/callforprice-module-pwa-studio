@@ -19,17 +19,6 @@ module.exports = targets => {
          */
         flags[targets.name] = {esModules: true, cssModules: true, graphqlQueries: true};
     });
-    targets.of('@magento/venia-ui').routes.tap(
-        routesArray => {
-            routesArray.push({
-                name: 'Simicart Page',
-                pattern: '/simicart',
-                path: '@simicart/CallForPrice/src/components/page1/index'
-            });
-            return routesArray;
-
-        }
-    );
     targets.of('@magento/pwa-buildpack').webpackCompiler.tap(compiler => {
         new moduleOverrideWebpackPlugin(componentOverrideMapping).apply(compiler);
     })

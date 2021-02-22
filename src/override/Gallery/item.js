@@ -15,6 +15,8 @@ import {useHistory} from "react-router-dom";
 import {useUserContext} from "@magento/peregrine/lib/context/user";
 
 import {useAuthBar} from "@magento/peregrine/lib/talons/AuthBar/useAuthBar";
+import {useAccountTrigger} from "@magento/peregrine/lib/talons/Header/useAccountTrigger";
+import AccountMenu from "@magento/venia-ui/lib/components/AccountMenu";
 
 // The placeholder image is 4:5, so we should make sure to size our product
 // images appropriately.
@@ -55,11 +57,13 @@ const GalleryItem = props => {
 
     const classes = mergeClasses(defaultClasses, props.classes);
 
-    const useDropDownProps = useDropdown();
     const {
-        setExpanded
-    } = useDropDownProps;
-    console.log(useDropDownProps)
+        accountMenuIsOpen,
+        accountMenuRef,
+        accountMenuTriggerRef,
+        setAccountMenuIsOpen,
+        handleTriggerClick
+    } = useAccountTrigger();
 
     if (!item) {
         return <ItemPlaceholder classes={classes} />;
@@ -150,16 +154,19 @@ const GalleryItem = props => {
                         <span>{name}</span>
                     </Link>
                     <section className={classes.cartActions}>
-                        <Button
-                            priority="high"
-                            onClick={() => {
-                                console.log('in');
-                                console.log(setExpanded)
-                                setExpanded(true);
-                            }}
-                        >
-                            {item.mp_callforprice_rule.button_label}
-                        </Button>
+                        <div ref={accountMenuTriggerRef}>
+                            <Button
+                                priority="high"
+                                onClick={handleTriggerClick}
+                            >
+                                {item.mp_callforprice_rule.button_label}
+                            </Button>
+                        </div>
+                        <AccountMenu
+                            ref={accountMenuRef}
+                            accountMenuIsOpen={accountMenuIsOpen}
+                            setAccountMenuIsOpen={setAccountMenuIsOpen}
+                        />
                     </section>
 
                 </div>
@@ -168,7 +175,11 @@ const GalleryItem = props => {
     }
     else if(mp_callforprice_rule.action == "redirect_url"){
         const redirect = () => {
-            history.push('/venia-bottoms.html?page=1')
+            let url_redirect = item.mp_callforprice_rule.url_redirect
+            if (url_redirect.includes('http'))
+                window.location.href = url_redirect;
+            else
+                history.push(url_redirect)
         }
         return (
             <div className={classes.root}>

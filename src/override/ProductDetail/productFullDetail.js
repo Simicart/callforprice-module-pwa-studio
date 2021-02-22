@@ -21,6 +21,9 @@ import {ADD_CONFIGURABLE_MUTATION, ADD_SIMPLE_MUTATION, CALL_FOR_PRICE_RULE, SUB
 import {Price} from "@magento/peregrine";
 import {useUserContext} from "@magento/peregrine/lib/context/user";
 import {useAuthBar} from "@magento/peregrine/lib/talons/AuthBar/useAuthBar";
+import {useAccountTrigger} from "@magento/peregrine/lib/talons/Header/useAccountTrigger";
+import {useHeader} from "@magento/peregrine/lib/talons/Header/useHeader";
+import AccountMenu from "@magento/venia-ui/lib/components/AccountMenu";
 
 const Options = React.lazy(() => import('@magento/venia-ui/lib/components/ProductOptions'));
 
@@ -63,6 +66,16 @@ const ProductFullDetail = props => {
         productDetails,
         quantity
     } = talonProps;
+
+    const {
+        accountMenuIsOpen,
+        accountMenuRef,
+        accountMenuTriggerRef,
+        setAccountMenuIsOpen,
+        handleTriggerClick
+    } = useAccountTrigger();
+
+    const [mpCallForPriceRequest, {data}] = useMutation(SUBMIT_POPUP_FORM);
 
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
@@ -146,7 +159,6 @@ const ProductFullDetail = props => {
     console.log(brandsData)
 
     function getRule(item){
-        const [mpCallForPriceRequest] = useMutation(SUBMIT_POPUP_FORM, {variables: {product_id: item.id, store_ids: item.mp_callforprice_rule.store_ids, name, phone, email, customer_note}});
         if(item.mp_callforprice_rule.action == "popup_quote_form"){
             return (
                 <Fragment>
@@ -209,9 +221,9 @@ const ProductFullDetail = props => {
                                             <label htmlFor="note"><b>Note</b></label>
                                             <input onChange={e => setCustomer_note(e.target.value)} id="customer_note" type="text" placeholder="Enter Your Note"/>
 
-                                            <button className={classes.btn} onClick={
-                                                mpCallForPriceRequest
-
+                                            <button className={classes.btn} onClick={()=> {
+                                                mpCallForPriceRequest({variables: {product_id: item.id, store_ids: item.mp_callforprice_rule.store_ids, name, phone, email, customer_note}})
+                                                }
                                             }>Submit</button>
                                         </Form>
                                     </div>
@@ -318,12 +330,19 @@ const ProductFullDetail = props => {
                             />
                         </section>
                         <section className={classes.cartActions}>
+                            <div ref={accountMenuTriggerRef}>
                                 <Button
                                     priority="high"
-                                    onClick={handleSignIn}
+                                    onClick={handleTriggerClick}
                                 >
                                     {item.mp_callforprice_rule.button_label}
                                 </Button>
+                            </div>
+                            <AccountMenu
+                                ref={accountMenuRef}
+                                accountMenuIsOpen={accountMenuIsOpen}
+                                setAccountMenuIsOpen={setAccountMenuIsOpen}
+                            />
                         </section>
                         <section className={classes.description}>
                             <h2 className={classes.descriptionTitle}>
@@ -341,9 +360,12 @@ const ProductFullDetail = props => {
         }
         else if(item.mp_callforprice_rule.action == "redirect_url"){
             const redirect = () => {
-                history.push('/venia-bottoms.html?page=1')
+                let url_redirect = item.mp_callforprice_rule.url_redirect
+                if (url_redirect.includes('http'))
+                    window.location.href = url_redirect;
+                else
+                    history.push(url_redirect)
             }
-            console.log(item.mp_callforprice_rule.url_redirect)
             return (
                 <Fragment>
                     {breadcrumbs}
@@ -503,7 +525,7 @@ const ProductFullDetail = props => {
 
     }
     if (!brandsData)
-    return ''
+        return ''
     return brandsData.products.items.map(getRule);
 
 };
