@@ -2,7 +2,7 @@
 
 This module acts as an add-on for [Mageplaza's Call For Price extension](https://www.mageplaza.com/magento-2-call-for-price/) to make it work with Magento PWA Studio.
 
-End result: https://callforprice.pwa-commerce.com/
+End result: https://callforprice.pwa-commerce.com/venia-tops.html
 
 ## Requirements
 
